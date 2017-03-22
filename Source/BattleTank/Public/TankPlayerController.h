@@ -23,10 +23,22 @@ public:
 
 private:
 	bool GetSightRayHitLocation(FVector &outHitLocation) const;
+	bool GetLookDirection(FVector2D ScreenLocation, FVector &outLookDirection) const;
+	bool GetLookVectorHitLocation(FVector Direction, FHitResult &outHitLocation) const;
 	void AimTowardsCrosshair();
 
 
 protected:
 	UPROPERTY(BlueprintReadWrite)
 	UWidget* PlayerUI = nullptr;
+
+private:
+	UPROPERTY(EditAnywhere)
+	float CrossHairXLocation = 0.5f;
+	
+	UPROPERTY(EditAnywhere)
+	float CrossHairYLocation = 0.5f;
+
+	UPROPERTY(EditAnywhere)
+	float LineTraceRange = 1000000.f;
 };

@@ -29,12 +29,43 @@ bool ATankPlayerController::GetSightRayHitLocation(FVector &outHitLocation) cons
 	int32 ViewportSizeX, ViewportSizeY;
 	GetViewportSize(ViewportSizeX, ViewportSizeY);
 
-	// raycast with landscape
+	FVector2D ScreenLocation = FVector2D(ViewportSizeX * CrossHairXLocation, ViewportSizeY * CrossHairXLocation);
+	FVector CameraWorldDirection;
+	FHitResult HitLocation;
 
-	// change hitlocation position to intersection with landscape
+	if (GetLookDirection(ScreenLocation, CameraWorldDirection)) {
+		if (GetLookVectorHitLocation(CameraWorldDirection, HitLocation)) {
+			outHitLocation = HitLocation.Location;
+			return true;
+		}
+	}
 
-	outHitLocation = FVector(1.0f);
-	return true;
+	return false;
+}
+
+bool ATankPlayerController::GetLookDirection(FVector2D ScreenLocation, FVector &outLookDirection) const {
+	FVector CameraWorldLocation;
+
+	return DeprojectScreenPositionToWorld(
+		ScreenLocation.X, 
+		ScreenLocation.Y, 
+		CameraWorldLocation, 
+		outLookDirection
+	);
+}
+
+bool ATankPlayerController::GetLookVectorHitLocation(FVector Direction, FHitResult &outHitResult) const {
+	FVector Start = PlayerCameraManager->GetCameraLocation();
+	FVector End = Start + Direction * LineTraceRange;
+	
+	return GetWorld()->LineTraceSingleByChannel(
+		outHitResult,
+		Start,
+		End,
+		ECollisionChannel::ECC_Visibility,
+		FCollisionQueryParams(FName(TEXT("")), false, GetOwner()),
+		FCollisionResponseParams()
+	);
 }
 
 ATank* ATankPlayerController::GetControlledTank() const {

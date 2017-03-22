@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Tank.h"
+#include "UMG.h"
 #include "GameFramework/PlayerController.h"
 #include "TankPlayerController.generated.h"
 
@@ -17,6 +18,15 @@ class BATTLETANK_API ATankPlayerController : public APlayerController
 public:
 	ATank* GetControlledTank() const;
 	
+	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
-	
+
+private:
+	bool GetSightRayHitLocation(FVector &outHitLocation) const;
+	void AimTowardsCrosshair();
+
+
+protected:
+	UPROPERTY(BlueprintReadWrite)
+	UWidget* PlayerUI = nullptr;
 };

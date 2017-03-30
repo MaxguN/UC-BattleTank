@@ -2,6 +2,7 @@
 
 #include "BattleTank.h"
 #include "TankBarrel.h"
+#include "TankTurret.h"
 #include "TankAimingComponent.h"
 
 
@@ -15,7 +16,7 @@ UTankAimingComponent::UTankAimingComponent()
 
 
 void UTankAimingComponent::AimAt(FVector Target, float LaunchSpeed) {
-	if (!Barrel) { return; }
+	if (!Barrel || !Turret) { return; }
 
 	FVector Direction;
 	bool success = UGameplayStatics::SuggestProjectileVelocity(
@@ -41,17 +42,24 @@ void UTankAimingComponent::AimAt(FVector Target, float LaunchSpeed) {
 }
 
 void UTankAimingComponent::MoveBarrelTowards(FVector Direction) {
-	if (!Barrel) { return; }
+	if (!Barrel || !Turret) { return; }
 
 	auto BarrelRotator = Barrel->GetForwardVector().Rotation();
 	auto AimAsRotator = Direction.Rotation();
 	auto DeltaRotator = AimAsRotator - BarrelRotator;
 
-	Barrel->Elevate(5.0f);
+	//UE_LOG(LogTemp, Warning, TEXT("%f delta rotator %s"), GetWorld()->TimeSeconds, *DeltaRotator.ToString());
+
+	Barrel->Elevate(DeltaRotator.Pitch);
+	Turret->Rotate(DeltaRotator.Yaw);
 }
 
 void UTankAimingComponent::SetBarrelReference(UTankBarrel* BarrelToSet) {
 	Barrel = BarrelToSet;
+}
+
+void UTankAimingComponent::SetTurretReference(UTankTurret* TurretToSet) {
+	Turret = TurretToSet;
 }
 
 // Called when the game starts
